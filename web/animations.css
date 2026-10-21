@@ -1,0 +1,190 @@
+/* ═════════════════════════════════════════════��═════════════════════
+   BDAL Threat Ops — motion system
+   Every loop is decorative and pointer-events-free.
+   All of it stops under [data-motion="reduced"] and
+   prefers-reduced-motion: reduce.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── ambient lighting ────────────────────────────────────────────── */
+@keyframes ambientOrange {
+  0%   { transform: translate3d(0, 0, 0) scale(1);      opacity: 0.42; }
+  50%  { transform: translate3d(-6vw, 5vh, 0) scale(1.08); opacity: 0.58; }
+  100% { transform: translate3d(4vw, -4vh, 0) scale(0.96); opacity: 0.38; }
+}
+
+@keyframes ambientCyan {
+  0%   { transform: translate3d(0, 0, 0) scale(1.04);     opacity: 0.30; }
+  50%  { transform: translate3d(7vw, -5vh, 0) scale(0.94); opacity: 0.46; }
+  100% { transform: translate3d(-5vw, 3vh, 0) scale(1.1);  opacity: 0.26; }
+}
+
+/* ── background grid ─────────────────────────────────────────────── */
+@keyframes gridDrift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 64px 64px, 64px 64px; }
+}
+
+@keyframes floorScroll {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 0 90px, 90px 0; }
+}
+
+/* ── geometric wireframes ────────────────────────────────────────── */
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── status + skeleton ───────────────────────────────────────────── */
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50%      { opacity: 1;    transform: scale(1.15); }
+}
+
+@keyframes shimmer {
+  from { background-position: 120% 0; }
+  to   { background-position: -120% 0; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── entrance choreography ───────────────────────────────────────── */
+@keyframes revealUp {
+  from { opacity: 0; transform: translate3d(0, 16px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── signal trace ────────────────────────────────────────────────── */
+@keyframes scanSweep {
+  0%   { transform: translateX(-6px); opacity: 0; }
+  8%   { opacity: 0.85; }
+  50%  { transform: translateX(220px); opacity: 0.5; }
+  92%  { transform: translateX(446px); opacity: 0.85; }
+  100% { transform: translateX(446px); opacity: 0; }
+}
+
+@keyframes signalDraw {
+  from { stroke-dashoffset: 1200; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* ── glitch (logo + hero words only, occasional) ─────────────────── */
+@keyframes glitchA {
+  0%, 90%, 100% { transform: translate3d(0, 0, 0); opacity: 0; clip-path: inset(0 0 100% 0); }
+  91%  { transform: translate3d(-3px, -1px, 0); opacity: 0.9; clip-path: inset(10% 0 58% 0); }
+  93%  { transform: translate3d(2px, 1px, 0);   opacity: 0.9; clip-path: inset(62% 0 16% 0); }
+  95%  { transform: translate3d(-1px, 0, 0);    opacity: 0;  clip-path: inset(0 0 100% 0); }
+}
+
+@keyframes glitchB {
+  0%, 90%, 100% { transform: translate3d(0, 0, 0); opacity: 0; clip-path: inset(0 0 100% 0); }
+  91.5% { transform: translate3d(3px, 1px, 0);  opacity: 0.9; clip-path: inset(24% 0 44% 0); }
+  93.5% { transform: translate3d(-2px, -1px, 0); opacity: 0.9; clip-path: inset(48% 0 32% 0); }
+  95.5% { transform: translate3d(1px, 0, 0);   opacity: 0;  clip-path: inset(0 0 100% 0); }
+}
+
+@keyframes glitchFlicker {
+  0%, 89%, 96%, 100% { opacity: 1; }
+  91%  { opacity: 0.45; }
+  93%  { opacity: 0.8; }
+  95%  { opacity: 0.5; }
+}
+
+/* ── hero headline: per-character fly-in + RGB slice ───────────────── */
+/* reference treatment of templatemo #596 "electric xtra" */
+@keyframes charFlyIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glitch-1 {
+  0%, 100% { clip-path: inset(0 0 0 0);     transform: translate(0); }
+  20%      { clip-path: inset(33% 0 33% 0); transform: translate(-2px); }
+  40%      { clip-path: inset(66% 0 0 0);   transform: translate(2px); }
+  60%      { clip-path: inset(0 0 66% 0);   transform: translate(1px); }
+  80%      { clip-path: inset(25% 0 50% 0); transform: translate(-1px); }
+}
+
+@keyframes glitch-2 {
+  0%, 100% { clip-path: inset(0 0 0 0);     transform: translate(0); }
+  20%      { clip-path: inset(50% 0 25% 0); transform: translate(2px); }
+  40%      { clip-path: inset(0 0 75% 0);   transform: translate(-2px); }
+  60%      { clip-path: inset(75% 0 0 0);   transform: translate(-1px); }
+  80%      { clip-path: inset(40% 0 40% 0); transform: translate(1px); }
+}
+
+/* ── toasts ──────────────────────────────────────────────────────── */
+@keyframes toastIn {
+  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.98); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to   { opacity: 0; transform: translate3d(0, 8px, 0); }
+}
+
+/* ── applied entrance ────────────────────────────────────────────── */
+.screen:not([hidden]) > * {
+  animation: revealUp 560ms var(--ease) both;
+}
+.screen:not([hidden]) > *:nth-child(2) { animation-delay: 70ms; }
+.screen:not([hidden]) > *:nth-child(3) { animation-delay: 140ms; }
+.screen:not([hidden]) > *:nth-child(4) { animation-delay: 210ms; }
+.screen:not([hidden]) > *:nth-child(5) { animation-delay: 280ms; }
+
+.stat, .kpi, .chart-card, .agg-card, .stage {
+  animation: revealUp 520ms var(--ease) both;
+}
+.stat-grid .stat:nth-child(2) { animation-delay: 50ms; }
+.stat-grid .stat:nth-child(3) { animation-delay: 100ms; }
+.stat-grid .stat:nth-child(4) { animation-delay: 150ms; }
+.stat-grid .stat:nth-child(5) { animation-delay: 200ms; }
+.stat-grid .stat:nth-child(6) { animation-delay: 250ms; }
+.kpi-row .kpi:nth-child(2) { animation-delay: 50ms; }
+.kpi-row .kpi:nth-child(3) { animation-delay: 100ms; }
+.kpi-row .kpi:nth-child(4) { animation-delay: 150ms; }
+.kpi-row .kpi:nth-child(5) { animation-delay: 200ms; }
+.charts .chart-card:nth-child(2) { animation-delay: 60ms; }
+.charts .chart-card:nth-child(3) { animation-delay: 120ms; }
+.charts .chart-card:nth-child(4) { animation-delay: 180ms; }
+.charts .chart-card:nth-child(5) { animation-delay: 240ms; }
+.stage-chain .stage:nth-child(2) { animation-delay: 60ms; }
+.stage-chain .stage:nth-child(3) { animation-delay: 120ms; }
+.stage-chain .stage:nth-child(4) { animation-delay: 180ms; }
+.stage-chain .stage:nth-child(5) { animation-delay: 240ms; }
+.stage-chain .stage:nth-child(6) { animation-delay: 300ms; }
+
+.glitch::before { animation: glitchA 7.5s steps(1) infinite; }
+.glitch::after  { animation: glitchB 7.5s steps(1) infinite; }
+.glitch         { animation: glitchFlicker 7.5s steps(1) infinite; }
+.glitch--alt::before { animation-delay: 0.15s; }
+.glitch--alt::after  { animation-delay: 0.3s; }
+.glitch--alt { animation-delay: 0.1s; }
+
+.signal__scan { animation: scanSweep 7s var(--ease) infinite; }
+.signal__line { animation: signalDraw 1400ms var(--ease) both; }
+
+.hero__title::before { animation: glitch-1 .5s infinite; }
+.hero__title::after  { animation: glitch-2 .5s infinite; }
+
+.toast.is-leaving { animation: toastOut 220ms var(--ease) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .screen:not([hidden]) > *,
+  .stat, .kpi, .chart-card, .agg-card, .stage { animation: none !important; }
+  /* the headline must stay fully readable, not hidden behind an intro */
+  .glitch-text::before,
+  .glitch-text::after { animation: none !important; }
+  .char {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

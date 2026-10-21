@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" data-accent="orange" data-grid="on" data-particles="on" data-motion="full" data-density="comfortable">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>BDAL Threat Ops — Cybersecurity Analytics Console</title>
+<meta name="description" content="Research console for the BDAL simulated cybersecurity threat pipeline: dataset to batch generator to Apache Flume to PySpark.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23090B0D'/%3E%3Cpath d='M16 5 27 10.4v8.2c0 5-4.3 7.3-11 8.4-6.7-1.1-11-3.4-11-8.4v-8.2z' fill='none' stroke='%23FF650A' stroke-width='1.7'/%3E%3Cpath d='M10 16h3l2.5-4 3 8 2.5-4h3' fill='none' stroke='%23FF650A' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="animations.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+
+<!-- ── decorative background system (never interactive) ─────────────── -->
+<div class="bg" aria-hidden="true">
+  <div class="bg__base"></div>
+  <div class="bg__ambient bg__ambient--orange"></div>
+  <div class="bg__ambient bg__ambient--cyan"></div>
+  <div class="bg__grid"></div>
+  <div class="bg__floor"></div>
+  <div class="bg__wires">
+    <svg class="wire wire--square" viewBox="0 0 200 200"><rect x="18" y="18" width="164" height="164"/><rect x="46" y="46" width="108" height="108"/><path d="M18 100h30M152 100h30M100 18v30M100 152v30"/></svg>
+    <svg class="wire wire--hex" viewBox="0 0 200 200"><polygon points="100,16 173,58 173,142 100,184 27,142 27,58"/><polygon points="100,48 144,73 144,127 100,152 56,127 56,73"/></svg>
+    <svg class="wire wire--angle" viewBox="0 0 200 200"><path d="M20 180 L20 40 L160 40"/><path d="M60 180 L60 80 L180 80"/><path d="M100 180 L100 120 L180 120"/></svg>
+  </div>
+  <canvas class="bg__particles" id="particles"></canvas>
+  <div class="bg__grain"></div>
+</div>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="app">
+
+  <!-- ── body ─────────────────────────────────────────────────────── -->
+  <div class="body">
+    <header class="topbar">
+      <div class="topbar__brand">
+        <span class="brand__mark glitch" data-text="BDAL" aria-hidden="true">
+          <svg viewBox="0 0 32 32" class="brand__svg"><path d="M16 3 28 9v10c0 6-5 8.6-12 10-7-1.4-12-4-12-10V9z"/><path d="M9 16h3l2.5-4 3 8 2.5-4h3"/></svg>
+        </span>
+        <span class="brand__text">
+          <strong class="brand__name">BDAL Threat Ops</strong>
+          <span class="brand__sub">Pipeline console</span>
+        </span>
+      </div>
+
+      <nav class="nav" id="nav" aria-label="Primary">
+        <ul class="nav__list" role="list">
+          <li>
+            <button class="nav__item" type="button" data-nav="dashboard" aria-current="page">
+              <svg class="nav__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v8H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 15h7v6H3z"/></svg>
+              <span class="nav__label">Dashboard</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav__item" type="button" data-nav="analytics">
+              <svg class="nav__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="2"/></svg>
+              <span class="nav__label">Threat Analytics</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav__item" type="button" data-nav="records">
+              <svg class="nav__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16"/><path d="M3 9h18M3 14h18M9 4v16"/></svg>
+              <span class="nav__label">Records</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav__item" type="button" data-nav="diagnostics">
+              <svg class="nav__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h4l2.5-6 4 13 3-9 2 2h4.5"/></svg>
+              <span class="nav__label">Diagnostics</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <span class="crumbs__page" id="pageTitle">Dashboard</span>
+      </nav>
+
+      <div class="topbar__right">
+        <div class="status-pill" id="statusPill" data-state="loading" role="status" aria-live="polite">
+          <span class="status-pill__dot" aria-hidden="true"></span>
+          <span class="status-pill__text">Checking pipeline</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main" id="main" tabindex="-1">
+
+      <!-- ── SCREEN: DASHBOARD ─────────────────────────────────────── -->
+      <section class="screen is-active" id="screen-dashboard" data-screen="dashboard">
+        <div class="hero">
+          <div class="hero__copy">
+            <p class="eyebrow">Global cybersecurity threat analysis · 2015–2024</p>
+            <h1 class="hero__title glitch-text" id="heroTitle" data-text="THREATS. SIGNALS. CONTROL." aria-label="THREATS. SIGNALS. CONTROL.">THREATS. SIGNALS. CONTROL.</h1>
+            <p class="hero__copy-text">
+              3,000 synthetic incidents travel from a CSV file through a batch generator, Apache Flume and PySpark.
+              Every number on this console comes from that data or from the live pipeline status.
+            </p>
+            <div class="hero__actions">
+              <button class="btn btn--primary" type="button" data-goto="analytics">Open Threat Analytics</button>
+              <button class="btn btn--ghost" type="button" data-goto="records">View Records</button>
+              <button class="btn btn--ghost btn--cyan" type="button" data-goto="diagnostics">Diagnostics</button>
+            </div>
+          </div>
+
+          <figure class="signal card" id="signalPanel">
+            <figcaption class="signal__head">
+              <span class="label-mono">Incident signal</span>
+              <span class="signal__meta label-mono" id="signalMeta">incidents per year</span>
+            </figcaption>
+            <svg class="signal__svg" id="signalSvg" viewBox="0 0 440 150" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="sigGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#00CFFF"/>
+                  <stop offset="52%" stop-color="#FF9B36"/>
+                  <stop offset="100%" stop-color="#FF650A"/>
+                </linearGradient>
+              </defs>
+              <g class="signal__grid" id="signalGrid"></g>
+              <polyline class="signal__line" id="signalLine" points=""/>
+              <g class="signal__dots" id="signalDots"></g>
+              <line class="signal__scan" id="signalScan" x1="0" y1="0" x2="0" y2="150"/>
+            </svg>
+            <div class="signal__axis label-mono" id="signalAxis"></div>
+            <p class="signal__note" id="signalNote">—</p>
+          </figure>
+        </div>
+
+        <section class="block" aria-labelledby="pipelineHead">
+          <div class="block__head">
+            <h2 class="block__title" id="pipelineHead">Pipeline status</h2>
+            <p class="block__hint label-mono" id="pipelineHint">GET /api/status</p>
+          </div>
+          <div class="stat-grid" id="pipelineStatus"></div>
+        </section>
+
+        <section class="block" aria-labelledby="kpiHead">
+          <div class="block__head">
+            <h2 class="block__title" id="kpiHead">Landscape summary</h2>
+            <p class="block__hint label-mono" id="kpiHint">Filtered dataset</p>
+          </div>
+          <div class="kpi-row" id="kpiRow"></div>
+        </section>
+
+        <section class="block" aria-labelledby="chartsHead">
+          <div class="block__head">
+            <h2 class="block__title" id="chartsHead">Trend analysis</h2>
+            <p class="block__hint label-mono" id="chartHint">Source: Global_Cybersecurity_Threats_2015-2024.csv</p>
+          </div>
+
+          <div class="dash-grid">
+            <aside class="filters card" id="filterPanel" aria-label="Filter records">
+              <div class="card__head">
+                <h3 class="card__title">Filters</h3>
+                <button class="btn btn--ghost btn--sm" id="resetFilters" type="button">Reset</button>
+              </div>
+              <div class="filters__groups" id="filterGroups"></div>
+              <p class="filters__hint" data-tip="OR inside a group · AND across groups">OR inside · AND across</p>
+            </aside>
+
+            <div class="charts" id="chartArea">
+              <article class="card chart-card chart-card--wide">
+                <div class="card__head">
+                  <h3 class="card__title">Cybersecurity Incidents by Year</h3>
+                  <span class="card__meta label-mono" id="metaYear">—</span>
+                </div>
+                <div class="chart-box"><canvas id="chartYear"></canvas></div>
+              </article>
+
+              <article class="card chart-card">
+                <div class="card__head">
+                  <h3 class="card__title">Incidents by Attack Type</h3>
+                  <span class="card__meta label-mono" id="metaType">—</span>
+                </div>
+                <div class="chart-box"><canvas id="chartType"></canvas></div>
+              </article>
+
+              <article class="card chart-card">
+                <div class="card__head">
+                  <h3 class="card__title">Target Industries</h3>
+                  <span class="card__meta label-mono" id="metaIndustry">—</span>
+                </div>
+                <div class="chart-box"><canvas id="chartIndustry"></canvas></div>
+              </article>
+
+              <article class="card chart-card chart-card--row">
+                <div class="card__head">
+                  <h3 class="card__title">Incidents by Country</h3>
+                  <span class="card__meta label-mono" id="metaCountry">—</span>
+                </div>
+                <div class="chart-box"><canvas id="chartCountry"></canvas></div>
+              </article>
+
+              <article class="card chart-card chart-card--hero">
+                <div class="card__head">
+                  <h3 class="card__title">Financial Loss vs. Affected Users</h3>
+                  <span class="card__meta label-mono" id="metaScatter">—</span>
+                </div>
+                <div class="chart-box"><canvas id="chartScatter"></canvas></div>
+              </article>
+
+              <div class="empty" id="chartEmpty" hidden>
+                <p class="empty__title">No records match the selected filters.</p>
+                <p class="empty__text">Widen a filter group or reset the filters to bring the charts back.</p>
+                <button class="btn btn--primary" type="button" data-reset-filters>Reset filters</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- ── SCREEN: THREAT ANALYTICS ─────────────────────────────── -->
+      <section class="screen" id="screen-analytics" data-screen="analytics" hidden>
+        <header class="screen__head">
+          <div>
+            <p class="eyebrow">PySpark aggregation output</p>
+            <h2 class="screen__title">Threat analytics</h2>
+          </div>
+          <button class="btn btn--ghost" id="reloadAnalytics" type="button">Reload aggregates</button>
+        </header>
+        <p class="screen__lede">
+          Each card reads <code>GET /api/analytics/&lt;name&gt;</code>, which serves the CSV that
+          <code>src\analytics.py</code> wrote into <code>output/analytics/</code>.
+        </p>
+        <div class="analytics-grid" id="analyticsGrid"></div>
+      </section>
+
+      <!-- ── SCREEN: RECORDS ───────────────────────────────────────── -->
+      <section class="screen" id="screen-records" data-screen="records" hidden>
+        <header class="screen__head">
+          <div>
+            <p class="eyebrow">Source rows</p>
+            <h2 class="screen__title">Records</h2>
+          </div>
+          <div class="records__tools">
+            <label class="field">
+              <span class="field__label label-mono">Search</span>
+              <input class="input" id="recordSearch" type="search" placeholder="country, attack type, industry, source…" autocomplete="off">
+            </label>
+            <p class="records__count label-mono" id="recordCount">—</p>
+          </div>
+        </header>
+
+        <div class="table-wrap card">
+          <table class="table" id="recordsTable">
+            <caption class="sr-only">Filtered incident records from the source dataset</caption>
+            <thead>
+              <tr>
+                <th scope="col" class="num">#</th>
+                <th scope="col">Country</th>
+                <th scope="col" class="num">Year</th>
+                <th scope="col">Attack type</th>
+                <th scope="col">Target industry</th>
+                <th scope="col" class="num">Loss (M $)</th>
+                <th scope="col" class="num">Affected users</th>
+                <th scope="col" class="num">Resolution (h)</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody"></tbody>
+          </table>
+          <div class="empty" id="recordsEmpty" hidden>
+            <p class="empty__title">No records match your search.</p>
+            <p class="empty__text">Clear the search box to list every row in the dataset.</p>
+          </div>
+        </div>
+
+        <nav class="pager" aria-label="Record pages">
+          <button class="btn btn--ghost btn--sm" id="prevPage" type="button">Previous</button>
+          <p class="pager__info label-mono" id="pageInfo">Page 1 of 1</p>
+          <button class="btn btn--ghost btn--sm" id="nextPage" type="button">Next</button>
+        </nav>
+      </section>
+
+      <!-- ── SCREEN: DIAGNOSTICS ──────────────────────────────────── -->
+      <section class="screen" id="screen-diagnostics" data-screen="diagnostics" hidden>
+        <header class="screen__head">
+          <div>
+            <p class="eyebrow">Pipeline health</p>
+            <h2 class="screen__title">Diagnostics</h2>
+          </div>
+          <button class="btn btn--primary" id="refreshStatus" type="button">Refresh status</button>
+        </header>
+        <p class="screen__lede">
+          Stage state is derived from the live <code>/api/status</code> payload and the aggregation endpoints.
+          Nothing on this screen is simulated.
+        </p>
+
+        <ol class="stage-chain" id="stageChain" aria-label="Pipeline stages"></ol>
+
+        <div class="diag-grid">
+          <section class="card terminal" aria-labelledby="termHead">
+            <div class="terminal__bar">
+              <span class="terminal__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="terminal__title label-mono" id="termHead">api / status</span>
+            </div>
+            <div class="terminal__body" id="terminalBody"></div>
+          </section>
+
+          <section class="card" aria-labelledby="factsHead">
+            <div class="card__head">
+              <h3 class="card__title" id="factsHead">Observed facts</h3>
+            </div>
+            <dl class="facts" id="diagFacts"></dl>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p class="footer__note">
+        <span class="badge badge--warn">Simulated dataset</span>
+        <strong>BDAL research demonstration.</strong> Built on a synthetic 2015–2024 threat dataset — not a live threat feed.
+        Every figure here is computed from <code>Global_Cybersecurity_Threats_2015-2024.csv</code> and from the local pipeline status API.
+        This console does not monitor real systems or live threats.
+      </p>
+      <div class="footer__meta">
+        <p class="label-mono" id="footerFacts">loading dataset…</p>
+        <p class="label-mono">dataset → stream_data.py → flume → pyspark → console</p>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" role="region" aria-label="Notifications" aria-live="polite"></div>
+
+</body>
+</html>

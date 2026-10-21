@@ -1,14 +1,22 @@
-.venv/
+# Python
 __pycache__/
 *.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Streamlit
 .streamlit/secrets.toml
+
+# Logs
+*.log
 flume.log
+
+# Generated pipeline artifacts (recreated by the pipeline, never committed)
 output/*
 !output/.gitkeep
-!output/analytics/
-!output/flume/
 incoming/*
 !incoming/.gitkeep
 
-output/analytics/
-output/flume/
+# Tooling scratch
+.playwright-mcp/
